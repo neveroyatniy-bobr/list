@@ -27,37 +27,40 @@ void VectorPrintError(VectorError error) {
             fprintf(stderr, "Выполнено без ошибок\n");
             break;
         case POP_ON_EMPTY_VECTOR:
-            fprintf(stderr, "Попытка удалить элемент из пустого стэка\n");
+            fprintf(stderr, "Попытка удалить элемент из пустого вектора\n");
             break;
         case VECTOR_NULL_PTR:
-            fprintf(stderr, "Нулевой указатель на стэк\n");
+            fprintf(stderr, "Нулевой указатель на вектор\n");
             break;
         case VECTOR_EXPANTION_ERR:
-            fprintf(stderr, "Ошибка увеличения памяти для стэка\n");
+            fprintf(stderr, "Ошибка увеличения памяти для вектора\n");
             break;
         case VECTOR_CONTRACTION_ERR:
-            fprintf(stderr, "Ошибка уменьшения памяти для стэка\n");
+            fprintf(stderr, "Ошибка уменьшения памяти для вектора\n");
             break;
         case VECTOR_INIT_ERR:
-            fprintf(stderr, "Ошибка выделения памяти на стэк\n");
+            fprintf(stderr, "Ошибка выделения памяти на вектор\n");
             break;
         case VECTOR_DATA_NULL_PTR:
-            fprintf(stderr, "Нулевой указатель на данные стэка\n");
+            fprintf(stderr, "Нулевой указатель на данные вектора\n");
             break;
         case VECTOR_OVERFLOW:
-            fprintf(stderr, "Переполнение стэка\n");
+            fprintf(stderr, "Переполнение вектора\n");
             break;
         case VECTOR_POPED_ELEM_NULL_PTR:
             fprintf(stderr, "Нулевой указатель на удаленный элемент\n");
             break;
         case VECTOR_BIRD_ERROR:
-            fprintf(stderr, "Канарейка: Вмешательство в буффер стэка извне\n");
+            fprintf(stderr, "Канарейка: Вмешательство в буффер вектора извне\n");
             break;
         case VECTOR_HANDLER_NULL_PTR:
             fprintf(stderr, "Попытка передать в качестве указателя на хэндлер нулевой указатель\n");
             break;
         case VECTOR_HASH_ERROR:
-            fprintf(stderr, "Хэш: Вмешательство в буффер стэка извне\n");
+            fprintf(stderr, "Хэш: Вмешательство в буффер вектора извне\n");
+            break;
+        case VECTOR_OUT_OF_RANGE:
+            fprintf(stderr, "Попытка обратиться к эелементу вне вектора\n");
             break;
         default:
             fprintf(stderr, "Непредвиденная ошибка\n");
@@ -130,10 +133,10 @@ void VectorDump(Vector *vector, const char* file, size_t line) {
     fprintf(stderr, BYEL "|" GRN " idx " BYEL "|" GRN " value  " BYEL "|" GRN " address        " BYEL "|\n" reset);
     fprintf(stderr, BYEL "|-------------------------------|\n" reset);
     if (vector->size > 0) {
-        fprintf(stderr, BYEL "|" MAG " %3ld " BYEL "|" MAG " %5ld  " BYEL "|" MAG " %p " BYEL "|" GRN " <-- end\n" reset, (ssize_t)vector->size - 1, *(long int*)VoidPtrPlus(vector->data, (ssize_t)vector->size - 1), VoidPtrPlus(vector->data, (ssize_t)vector->size - 1));
+        fprintf(stderr, BYEL "|" MAG " %5ld " BYEL "|" MAG " %16ld  " BYEL "|" MAG " %p " BYEL "|" GRN " <-- end\n" reset, (ssize_t)vector->size - 1, *(long int*)VoidPtrPlus(vector->data, (ssize_t)vector->size - 1), VoidPtrPlus(vector->data, (ssize_t)vector->size - 1));
     }
     for (ssize_t i = (ssize_t)vector->size - 2; i >= 0; --i) {
-        fprintf(stderr, BYEL "|" MAG " %3ld " BYEL "|" MAG " %5ld  " BYEL "|" MAG " %p " BYEL "|\n" reset, i, *(long int*)VoidPtrPlus(vector->data, i), VoidPtrPlus(vector->data, i));
+        fprintf(stderr, BYEL "|" MAG " %5ld " BYEL "|" MAG " %16ld  " BYEL "|" MAG " %p " BYEL "|\n" reset, i, *(long int*)VoidPtrPlus(vector->data, i), VoidPtrPlus(vector->data, i));
     }
     fprintf(stderr, BYEL "=================================\n" reset);
     fprintf(stderr, GRN "size " BYEL "=" MAG " %lu" BYEL "," GRN " elem_size " BYEL "=" MAG " %lu" BYEL "," GRN " capacity " BYEL "=" MAG " %lu" "\n" reset, vector->size, vector->elem_size, vector->capacity);
@@ -144,35 +147,33 @@ void VectorDump(Vector *vector, const char* file, size_t line) {
     fprintf(stderr, reset);
 }
 
-VectorError VectorInit(Vector** vector, size_t capacity, size_t elem_size) {
+VectorError VectorInit(Vector* vector, size_t capacity, size_t elem_size) {
     assert(vector != NULL);
 
-    *vector = (Vector*)calloc(1, sizeof(Vector));
+    vector->capacity = max(VECTOR_MIN_CAPACITY, capacity) + 2 * VECTOR_BIRD_SIZE;
 
-    (*vector)->capacity = max(VECTOR_MIN_CAPACITY, capacity) + 2 * VECTOR_BIRD_SIZE;
+    vector->size = 0;
 
-    (*vector)->size = 0;
+    vector->elem_size = elem_size;
 
-    (*vector)->elem_size = elem_size;
-
-    void* data = VoidPtrPlus(calloc((*vector)->capacity, (*vector)->elem_size), (ssize_t)VECTOR_BIRD_SIZE * (ssize_t)(*vector)->elem_size);
+    void* data = VoidPtrPlus(calloc(vector->capacity, vector->elem_size), (ssize_t)VECTOR_BIRD_SIZE * (ssize_t)vector->elem_size);
     if (data == NULL) {
-        return (*vector)->last_error_code = VECTOR_INIT_ERR;
+        return vector->last_error_code = VECTOR_INIT_ERR;
     }
-    (*vector)->data = data;
+    vector->data = data;
 
-    for (ssize_t i = 0; i < (ssize_t)VECTOR_BIRD_SIZE * (ssize_t)(*vector)->elem_size; i++) {
-        memcpy(VoidPtrPlus((*vector)->data, - (ssize_t)VECTOR_BIRD_SIZE * (ssize_t)(*vector)->elem_size + i), &BIRD_CHAR_VALUE, 1);
-        memcpy(VoidPtrPlus((*vector)->data, ((ssize_t)(*vector)->capacity - 2 * (ssize_t)VECTOR_BIRD_SIZE) * (ssize_t)(*vector)->elem_size + i), &BIRD_CHAR_VALUE, 1);
+    for (ssize_t i = 0; i < (ssize_t)VECTOR_BIRD_SIZE * (ssize_t)vector->elem_size; i++) {
+        memcpy(VoidPtrPlus(vector->data, - (ssize_t)VECTOR_BIRD_SIZE * (ssize_t)vector->elem_size + i), &BIRD_CHAR_VALUE, 1);
+        memcpy(VoidPtrPlus(vector->data, ((ssize_t)vector->capacity - 2 * (ssize_t)VECTOR_BIRD_SIZE) * (ssize_t)vector->elem_size + i), &BIRD_CHAR_VALUE, 1);
     }
 
-    (*vector)->hash = VectorHash(*vector);
+    vector->hash = VectorHash(vector);
 
-    (*vector)->last_error_code = VECTOR_OK;
+    vector->last_error_code = VECTOR_OK;
 
-    VECTOR_CHECK((*vector));
+    VECTOR_CHECK(vector);
 
-    return (*vector)->last_error_code = VECTOR_OK;
+    return vector->last_error_code = VECTOR_OK;
 }
 
 VectorError VectorExpantion(Vector* vector) {
@@ -245,8 +246,6 @@ VectorError VectorFree(Vector* vector) {
     vector->size = 0;
     vector->data = NULL;
 
-    PROTECTED_FREE(vector);
-
     return VECTOR_OK;
 }
 
@@ -304,8 +303,8 @@ VectorError VectorGet(Vector* vector, size_t i, void* dest){
 
     VECTOR_CHECK(vector);
 
-    if (vector->size == 0) {
-        return vector->last_error_code = POP_ON_EMPTY_VECTOR;
+    if (i >= vector->size) {
+        return vector->last_error_code = VECTOR_OUT_OF_RANGE;
     }
 
     memcpy(dest, VoidPtrPlus(vector->data, (ssize_t)i * (ssize_t)vector->elem_size), vector->elem_size);
@@ -322,8 +321,8 @@ VectorError VectorSet(Vector* vector, size_t i, void* src) {
 
     VECTOR_CHECK(vector);
 
-    if (vector->size == 0) {
-        return vector->last_error_code = POP_ON_EMPTY_VECTOR;
+    if (i >= vector->size) {
+        return vector->last_error_code = VECTOR_OUT_OF_RANGE;
     }
 
     memcpy(VoidPtrPlus(vector->data, (ssize_t)i * (ssize_t)vector->elem_size), src, vector->elem_size);

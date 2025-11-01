@@ -15,7 +15,8 @@ enum VectorError {
     VECTOR_POPED_ELEM_NULL_PTR =  8,
     VECTOR_BIRD_ERROR          =  9,
     VECTOR_HANDLER_NULL_PTR    = 10,
-    VECTOR_HASH_ERROR          = 11
+    VECTOR_HASH_ERROR          = 11, 
+    VECTOR_OUT_OF_RANGE        = 12
 };
 
 void VectorPrintError(VectorError error);
@@ -46,7 +47,7 @@ static const char BIRD_CHAR_VALUE = (char)222;
 
 static const size_t NULL_VALUE = 0;
 
-VectorError VectorInit(Vector** vector, size_t elem_capacity, size_t elem_size);
+VectorError VectorInit(Vector* vector, size_t elem_capacity, size_t elem_size);
 
 VectorError VectorExpantion(Vector* vector);
 
@@ -66,7 +67,7 @@ VectorError VectorVerefy(Vector* vector);
 
 void VectorDump(Vector* vector, const char* file, size_t line);
 
-#define VECTOR_CHECK(vector)                         \
+#define VECTOR_CHECK(vector)                        \
     vector->last_error_code = VectorVerefy(vector); \
     if (vector->last_error_code != VECTOR_OK) {     \
         return vector->last_error_code;             \
