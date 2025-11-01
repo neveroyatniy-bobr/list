@@ -14,7 +14,8 @@ enum ListError {
     LIST_OK                =  0,
     LIST_DATA_VECTOR_ERROR =  1,
     LIST_NEXT_VECTOR_ERROR =  2,
-    LIST_PREF_VECTOR_ERROR =  3
+    LIST_PREF_VECTOR_ERROR =  3,
+    DELETE_FECTIVE_ELEM    =  4
 };
 
 const char* ListStrError(ListError error);
@@ -35,6 +36,8 @@ static const size_t NO_FREE = 21312326;
 ListError ListInit(List* list);
 
 ListError ListDestroy(List* list);
+
+ListError ListExpansion(List* list);
 
 ListError ListVerefy(List* list);
 

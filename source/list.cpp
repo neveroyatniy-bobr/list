@@ -19,6 +19,9 @@ const char* ListStrError(ListError error) {
     case LIST_PREF_VECTOR_ERROR:
         return "Ошибка в векторе pref\n";
         break;
+    case DELETE_FECTIVE_ELEM:
+        return "Попытка удалить фективный элемент\n";
+        break;
     default:
         return "Непредвиденная ошибка\n";
         break;
@@ -87,6 +90,25 @@ ListError ListDestroy(List* list) {
     return list->last_error = LIST_OK;
 }
 
+ListError ListExpansion(List* list) {
+    int pushed_elem = 0;
+    if (VectorPush(&list->data, &pushed_elem) != VECTOR_OK) {
+        return list->last_error = LIST_DATA_VECTOR_ERROR;
+    }
+
+    if (VectorPush(&list->next, (void*)const_cast<size_t*>(&NO_FREE)) != VECTOR_OK) {
+        return list->last_error = LIST_NEXT_VECTOR_ERROR;
+    }
+
+    if (VectorPush(&list->pref, (void*)const_cast<size_t*>(&NO_FREE)) != VECTOR_OK) {
+        return list->last_error = LIST_PREF_VECTOR_ERROR;
+    }
+
+    list->free = list->data.size - 1;
+
+    return list->last_error = LIST_OK;
+}
+
 ListError ListVerefy(List* list) {
     assert(list != NULL);
 
@@ -116,21 +138,7 @@ ListError ListInsert(List* list, size_t id, list_elem_t elem) {
     LIST_CHECK(list);
 
     if (list->free == NO_FREE) {
-        //FIXME function
-        int pushed_elem = 0;
-        if (VectorPush(&list->data, &pushed_elem) != VECTOR_OK) {
-            return list->last_error = LIST_DATA_VECTOR_ERROR;
-        }
-
-        if (VectorPush(&list->next, (void*)const_cast<size_t*>(&NO_FREE)) != VECTOR_OK) {
-            return list->last_error = LIST_NEXT_VECTOR_ERROR;
-        }
-
-        if (VectorPush(&list->pref, (void*)const_cast<size_t*>(&NO_FREE)) != VECTOR_OK) {
-            return list->last_error = LIST_PREF_VECTOR_ERROR;
-        }
-
-        list->free = list->data.size - 1;
+        ListExpansion(list);
     }
 
     size_t next_free = 0;
@@ -176,7 +184,9 @@ ListError ListDelete(List* list, size_t id) {
 
     LIST_CHECK(list);
 
-    //FIXME err if id == 0 (delete_fective_elem)
+    if (id == 0) {
+        return list->last_error = DELETE_FECTIVE_ELEM;
+    }
 
     // FIXME function?
     size_t delete_next = 0;
