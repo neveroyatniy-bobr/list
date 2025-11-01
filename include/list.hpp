@@ -1,4 +1,53 @@
 #ifndef LIST_H_
 #define LIST_H_
 
+#include <stdio.h>
+
+#include "vector.hpp"
+
+struct List;
+
+
+typedef int list_elem_t;
+
+enum ListError {
+    LIST_OK                =  0,
+    LIST_DATA_VECTOR_ERROR =  1,
+    LIST_NEXT_VECTOR_ERROR =  2,
+    LIST_PREF_VECTOR_ERROR =  3
+};
+
+const char* ListStrError(ListError error);
+
+void ListPrintError(List* list, const char* file, int line);
+
+struct List {
+    Vector data; // <int>
+    Vector next; // <size_t>
+    Vector pref; // <size_t>
+    size_t free;
+    ListError last_error;
+};
+
+static const list_elem_t FECTIVE_ELEM_VALUE = 1789657045;
+static const size_t NO_FREE = 21312326;
+
+ListError ListInit(List* list);
+
+ListError ListDestroy(List* list);
+
+ListError ListVerefy(List* list);
+
+ListError ListInsert(List* list, size_t id, list_elem_t elem);
+
+ListError ListDelete(List* list, size_t id);
+
+#define LIST_CHECK(list)                    \
+    {                                       \
+        ListError err_ = ListVerefy(list);  \
+        if (err_ != LIST_OK) {              \
+            return err_;                    \
+        }                                   \
+    }
+
 #endif // LIST_H_
