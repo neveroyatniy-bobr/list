@@ -16,8 +16,8 @@ const char* ListStrError(ListError error) {
     case LIST_NEXT_VECTOR_ERROR:
         return "Ошибка в векторе next\n";
         break;
-    case LIST_PREF_VECTOR_ERROR:
-        return "Ошибка в векторе pref\n";
+    case LIST_PREV_VECTOR_ERROR:
+        return "Ошибка в векторе prev\n";
         break;
     case DELETE_FECTIVE_ELEM:
         return "Попытка удалить фективный элемент\n";
@@ -45,8 +45,8 @@ ListError ListInit(List* list) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
     
-    if (VectorInit(&list->pref, 0, sizeof(size_t)) != VECTOR_OK) {
-        return list->last_error = LIST_PREF_VECTOR_ERROR;
+    if (VectorInit(&list->prev, 0, sizeof(size_t)) != VECTOR_OK) {
+        return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
     if (VectorPush(&list->data, (void*)const_cast<list_elem_t*>(&FECTIVE_ELEM_VALUE)) != VECTOR_OK) {
@@ -59,8 +59,8 @@ ListError ListInit(List* list) {
         return LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorPush(&list->pref, &fective_id) != VECTOR_OK) {
-        return LIST_PREF_VECTOR_ERROR;
+    if (VectorPush(&list->prev, &fective_id) != VECTOR_OK) {
+        return LIST_PREV_VECTOR_ERROR;
     }
 
     list->free = NO_FREE;
@@ -83,8 +83,8 @@ ListError ListDestroy(List* list) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorFree(&list->pref) != VECTOR_OK) {
-        return list->last_error = LIST_PREF_VECTOR_ERROR;
+    if (VectorFree(&list->prev) != VECTOR_OK) {
+        return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
     return list->last_error = LIST_OK;
@@ -100,8 +100,8 @@ ListError ListExpansion(List* list) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorPush(&list->pref, (void*)const_cast<size_t*>(&NO_FREE)) != VECTOR_OK) {
-        return list->last_error = LIST_PREF_VECTOR_ERROR;
+    if (VectorPush(&list->prev, (void*)const_cast<size_t*>(&NO_FREE)) != VECTOR_OK) {
+        return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
     list->free = list->data.size - 1;
@@ -124,8 +124,8 @@ ListError ListVerefy(List* list) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorVerefy(&list->pref)!= VECTOR_OK) {
-        return list->last_error = LIST_PREF_VECTOR_ERROR;
+    if (VectorVerefy(&list->prev)!= VECTOR_OK) {
+        return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
     return list->last_error = LIST_OK;
@@ -159,16 +159,16 @@ ListError ListInsert(List* list, size_t id, list_elem_t elem) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorSet(&list->pref, list->free, &id) != VECTOR_OK) {
-        return list->last_error = LIST_PREF_VECTOR_ERROR;
+    if (VectorSet(&list->prev, list->free, &id) != VECTOR_OK) {
+        return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
     if (VectorSet(&list->next, id, &list->free) != VECTOR_OK) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorSet(&list->pref, id_next, &list->free) != VECTOR_OK) {
-        return list->last_error = LIST_PREF_VECTOR_ERROR;
+    if (VectorSet(&list->prev, id_next, &list->free) != VECTOR_OK) {
+        return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
     list->free = next_free;
@@ -194,17 +194,17 @@ ListError ListDelete(List* list, size_t id) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    size_t delete_pref = 0;
-    if (VectorGet(&list->pref, id, &delete_pref) != VECTOR_OK) {
-        return list->last_error = LIST_PREF_VECTOR_ERROR;
+    size_t delete_prev = 0;
+    if (VectorGet(&list->prev, id, &delete_prev) != VECTOR_OK) {
+        return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
-    if (VectorSet(&list->next, delete_pref, &delete_next) != VECTOR_OK) {
+    if (VectorSet(&list->next, delete_prev, &delete_next) != VECTOR_OK) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorSet(&list->pref, delete_next, &delete_pref) != VECTOR_OK) {
-        return list->last_error = LIST_PREF_VECTOR_ERROR;
+    if (VectorSet(&list->prev, delete_next, &delete_prev) != VECTOR_OK) {
+        return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
     if (VectorSet(&list->next, id, &list->free) != VECTOR_OK) {
