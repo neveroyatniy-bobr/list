@@ -233,6 +233,55 @@ void ListGraphDump(List* list, const char* file, int line) {
 
     FILE* dump_file = fopen("dump_file.html", "a");
 
+    fprintf(dump_file, "<table border=\"1\" style=\"font-size: %u; width: 50%%;\">\n", DUMP_FONT_SIZE);
+
+    fprintf(dump_file, "    <tr>\n");
+    fprintf(dump_file, "        <th>id</th>\n");
+    fprintf(dump_file, "        <th>value</th>\n");
+    fprintf(dump_file, "        <th>next</th>\n");
+    fprintf(dump_file, "        <th>prev</th>\n");
+    fprintf(dump_file, "    <tr>\n");
+
+    for (size_t elem_i = 0; elem_i < list->data.size; elem_i++) {
+        int value = 0;
+        VectorGet(&list->data, elem_i, &value);
+
+        size_t next = 0;
+        VectorGet(&list->next, elem_i, &next);
+
+        size_t prev = 0;
+        VectorGet(&list->prev, elem_i, &prev);
+
+        fprintf(dump_file, "    <tr>\n");
+
+        fprintf(dump_file, "        <th>%lu</th>\n", elem_i);
+
+        if (value == FECTIVE_ELEM_VALUE) {
+            fprintf(dump_file, "        <th>fective elem</th>\n");
+        }
+        else {
+            fprintf(dump_file, "        <th>%d</th>\n", value);
+        }
+
+        if (next == NULL_PTR) {
+            fprintf(dump_file, "        <th>null ptr</th>\n");
+        }
+        else {
+            fprintf(dump_file, "        <th>%lu</th>\n", next);
+        }
+
+        if (prev == NULL_PTR) {
+            fprintf(dump_file, "        <th>null ptr</th>\n");
+        }
+        else {
+            fprintf(dump_file, "        <th>%lu</th>\n", prev);
+        }
+
+        fprintf(dump_file, "    <tr>\n");
+    }
+
+    fprintf(dump_file, "</table>\n");
+
     fprintf(dump_file, "\n<p style=\"font-size: %upx;\">\n    size = %lu\n</p>\n", DUMP_FONT_SIZE, list->size);
 
     fprintf(dump_file, "<p style=\"font-size: %upx;\">\n    ERROR in %s:%d: %s</p>", DUMP_FONT_SIZE, file, line, ListStrError(list->last_error));
