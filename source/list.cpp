@@ -140,23 +140,27 @@ ListError ListVerefy(List* list) {
     }
 
     int fective_value = 0;
-    VectorGet(&list->data, 0, &fective_value);
+    if (VectorGet(&list->data, 0, &fective_value) != VECTOR_OK) {
+        return list->last_error = LIST_DATA_VECTOR_ERROR;
+    }
     if (fective_value != FECTIVE_ELEM_VALUE) {
-        return BAD_FECTIVE_ELEM;
+        return list->last_error = BAD_FECTIVE_ELEM;
     }
 
     size_t curent_id = 0;
     size_t next_id   = 0;
     for (size_t elem_i = 0; elem_i < list->size + 1; elem_i++) {
-        VectorGet(&list->next, curent_id, &next_id);
+        if (VectorGet(&list->next, curent_id, &next_id)) {
+            return list->last_error = LIST_NEXT_VECTOR_ERROR;
+        }
         curent_id = next_id;
 
         if (curent_id >= list->data.size) {
-            return LIST_GRAPH_ERROR;
+            return list->last_error = LIST_GRAPH_ERROR;
         }
     }
     if (curent_id != 0) {
-        return LIST_GRAPH_ERROR;
+        return list->last_error = LIST_GRAPH_ERROR;
     }
 
     size_t free_cnt = 0;
@@ -166,14 +170,16 @@ ListError ListVerefy(List* list) {
         free_cnt++;
 
         if (curent_free_id >= list->data.size) {
-            return LIST_GRAPH_ERROR;
+            return list->last_error = LIST_GRAPH_ERROR;
         }
 
-        VectorGet(&list->next, curent_free_id, &next_free_id);
+        if (VectorGet(&list->next, curent_free_id, &next_free_id)) {
+            return list->last_error = LIST_NEXT_VECTOR_ERROR;
+        }
         curent_free_id = next_free_id;
     }
     if (list->size + 1 + free_cnt != list->data.size) {
-        return LIST_GRAPH_ERROR;
+        return list->last_error = LIST_GRAPH_ERROR;
     }
 
     return list->last_error = LIST_OK;
