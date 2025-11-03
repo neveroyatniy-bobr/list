@@ -31,7 +31,7 @@ struct List {
 };
 
 static const list_elem_t FECTIVE_ELEM_VALUE = 1789657045;
-static const size_t NO_FREE = 21312326;
+static const size_t NULL_PTR = 21312326;
 
 ListError ListInit(List* list);
 
@@ -40,6 +40,8 @@ ListError ListDestroy(List* list);
 ListError ListExpansion(List* list);
 
 ListError ListVerefy(List* list);
+
+void ListGraphDump(List* list);
 
 ListError ListInsert(List* list, size_t id, list_elem_t elem);
 

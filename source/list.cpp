@@ -1,6 +1,7 @@
 #include "list.hpp"
 
 #include <assert.h>
+#include <stdlib.h>
 
 #include "color.hpp"
 
@@ -63,7 +64,7 @@ ListError ListInit(List* list) {
         return LIST_PREV_VECTOR_ERROR;
     }
 
-    list->free = NO_FREE;
+    list->free = NULL_PTR;
 
     LIST_CHECK(list);
 
@@ -96,11 +97,11 @@ ListError ListExpansion(List* list) {
         return list->last_error = LIST_DATA_VECTOR_ERROR;
     }
 
-    if (VectorPush(&list->next, (void*)const_cast<size_t*>(&NO_FREE)) != VECTOR_OK) {
+    if (VectorPush(&list->next, (void*)const_cast<size_t*>(&NULL_PTR)) != VECTOR_OK) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorPush(&list->prev, (void*)const_cast<size_t*>(&NO_FREE)) != VECTOR_OK) {
+    if (VectorPush(&list->prev, (void*)const_cast<size_t*>(&NULL_PTR)) != VECTOR_OK) {
         return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
@@ -131,13 +132,62 @@ ListError ListVerefy(List* list) {
     return list->last_error = LIST_OK;
 }
 
+void ListGraphDump(List* list) {
+    FILE* build_dump_file = fopen("build_dump_file.dot", "w");
+
+    fprintf(build_dump_file, "digraph G {\n    rankdir=LR;\n    node [shape=record];\n\n");
+
+    for (size_t elem_i = 0; elem_i < list->data.size; elem_i++) {
+        int value = 0;
+        VectorGet(&list->data, elem_i, &value);
+
+        size_t next = 0;
+        VectorGet(&list->next, elem_i, &next);
+
+        size_t prev = 0;
+        VectorGet(&list->prev, elem_i, &prev);
+
+        fprintf(build_dump_file, "    %lu [label=\"value = %d\\nid = %lu\\nnext = %lu\\nprev = %lu\"];\n", elem_i, value, elem_i, next, prev);
+    }
+
+    fprintf(build_dump_file, "\n");
+
+    for (size_t elem_i = 0; elem_i < list->data.size; elem_i++) {
+        size_t next = 0;
+        VectorGet(&list->next, elem_i, &next);
+
+        size_t prev = 0;
+        VectorGet(&list->prev, elem_i, &prev);
+
+        if (next != NULL_PTR) {
+            fprintf(build_dump_file, "    %lu -> %lu [label = \"next\"];\n", elem_i, next);
+        }
+
+        if (prev != NULL_PTR) {
+            fprintf(build_dump_file, "    %lu -> %lu [label = \"prev\"];\n", elem_i, prev);
+        }
+    }
+
+    fprintf(build_dump_file, "\n    free -> %lu;\n", list->free);
+
+    fprintf(build_dump_file, "    free [label=\"FREE\"];\n");
+
+    fprintf(build_dump_file, "}");
+
+    fclose(build_dump_file);
+
+    system("dot -Tpng build_dump_file.dot -o dump_file.png");
+
+    system("explorer.exe dump_file.png");
+}
+
 ListError ListInsert(List* list, size_t id, list_elem_t elem) {
     assert(list != NULL);
     assert(id < list->data.size);
 
     LIST_CHECK(list);
 
-    if (list->free == NO_FREE) {
+    if (list->free == NULL_PTR) {
         ListExpansion(list);
     }
 
@@ -208,6 +258,10 @@ ListError ListDelete(List* list, size_t id) {
     }
 
     if (VectorSet(&list->next, id, &list->free) != VECTOR_OK) {
+        return list->last_error = LIST_NEXT_VECTOR_ERROR;
+    }
+
+    if (VectorSet(&list->prev, id, (void*)const_cast<size_t*>(&NULL_PTR)) != VECTOR_OK) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
