@@ -1,4 +1,4 @@
 *.exe
 build/
 build_dump_file.dot
-dump_file.png
+dump_file.html

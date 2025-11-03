@@ -7,7 +7,6 @@
 
 struct List;
 
-
 typedef int list_elem_t;
 
 enum ListError {
@@ -34,7 +33,10 @@ struct List {
 };
 
 static const list_elem_t FECTIVE_ELEM_VALUE = 1789657045;
+
 static const size_t NULL_PTR = 21312326;
+
+static const unsigned int DUMP_FONT_SIZE = 36;
 
 ListError ListInit(List* list);
 
@@ -44,7 +46,7 @@ ListError ListExpansion(List* list);
 
 ListError ListVerefy(List* list);
 
-void ListGraphDump(List* list);
+void ListGraphDump(List* list, const char* file, int line);
 
 ListError ListInsert(List* list, size_t id, list_elem_t elem);
 

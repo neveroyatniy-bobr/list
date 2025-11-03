@@ -185,7 +185,7 @@ ListError ListVerefy(List* list) {
     return list->last_error = LIST_OK;
 }
 
-void ListGraphDump(List* list) {
+void ListGraphDump(List* list, const char* file, int line) {
     FILE* build_dump_file = fopen("build_dump_file.dot", "w");
 
     fprintf(build_dump_file, "digraph G {\n    rankdir=LR;\n    node [shape=record];\n\n");
@@ -229,9 +229,17 @@ void ListGraphDump(List* list) {
 
     fclose(build_dump_file);
 
-    system("dot -Tpng build_dump_file.dot -o dump_file.png");
+    system("dot -Tsvg build_dump_file.dot -o dump_file.html");
 
-    system("explorer.exe dump_file.png");
+    FILE* dump_file = fopen("dump_file.html", "a");
+
+    fprintf(dump_file, "\n<p style=\"font-size: %upx;\">\n    size = %lu\n</p>\n", DUMP_FONT_SIZE, list->size);
+
+    fprintf(dump_file, "<p style=\"font-size: %upx;\">\n    ERROR in %s:%d: %s</p>", DUMP_FONT_SIZE, file, line, ListStrError(list->last_error));
+
+    fclose(dump_file);
+
+    system("explorer.exe dump_file.html");
 }
 
 ListError ListInsert(List* list, size_t id, list_elem_t elem) {

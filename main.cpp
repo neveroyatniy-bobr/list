@@ -26,7 +26,7 @@ int main() {
         VectorGet(&list.next, 0, &fective_next);
     }
 
-    ListGraphDump(&list);
+    ListGraphDump(&list, __FILE__, __LINE__);
 
     if (ListDestroy(&list) != LIST_OK) {
         ListPrintError(&list, __FILE__, __LINE__);
