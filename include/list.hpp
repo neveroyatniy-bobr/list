@@ -15,7 +15,9 @@ enum ListError {
     LIST_DATA_VECTOR_ERROR =  1,
     LIST_NEXT_VECTOR_ERROR =  2,
     LIST_PREV_VECTOR_ERROR =  3,
-    DELETE_FECTIVE_ELEM    =  4
+    DELETE_FECTIVE_ELEM    =  4,
+    BAD_FECTIVE_ELEM       =  5,
+    LIST_GRAPH_ERROR       =  6
 };
 
 const char* ListStrError(ListError error);
@@ -27,6 +29,7 @@ struct List {
     Vector next; // <size_t>
     Vector prev; // <size_t>
     size_t free;
+    size_t size;
     ListError last_error;
 };
 

@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "vector.hpp"
 #include "color.hpp"
 
 const char* ListStrError(ListError error) {
@@ -22,6 +23,12 @@ const char* ListStrError(ListError error) {
         break;
     case DELETE_FECTIVE_ELEM:
         return "Попытка удалить фективный элемент\n";
+        break;
+    case BAD_FECTIVE_ELEM:
+        return "Нверный фективный элемент\n";
+        break;
+    case LIST_GRAPH_ERROR:
+        return "Ошибка в связях графа листа\n";
         break;
     default:
         return "Непредвиденная ошибка\n";
@@ -65,6 +72,8 @@ ListError ListInit(List* list) {
     }
 
     list->free = NULL_PTR;
+
+    list->size = 0;
 
     LIST_CHECK(list);
 
@@ -110,6 +119,7 @@ ListError ListExpansion(List* list) {
     return list->last_error = LIST_OK;
 }
 
+//FIXME Разделить LIST_GRAPH_ERROR на разные ошибки
 ListError ListVerefy(List* list) {
     assert(list != NULL);
 
@@ -127,6 +137,43 @@ ListError ListVerefy(List* list) {
 
     if (VectorVerefy(&list->prev)!= VECTOR_OK) {
         return list->last_error = LIST_PREV_VECTOR_ERROR;
+    }
+
+    int fective_value = 0;
+    VectorGet(&list->data, 0, &fective_value);
+    if (fective_value != FECTIVE_ELEM_VALUE) {
+        return BAD_FECTIVE_ELEM;
+    }
+
+    size_t curent_id = 0;
+    size_t next_id   = 0;
+    for (size_t elem_i = 0; elem_i < list->size + 1; elem_i++) {
+        VectorGet(&list->next, curent_id, &next_id);
+        curent_id = next_id;
+
+        if (curent_id >= list->data.size) {
+            return LIST_GRAPH_ERROR;
+        }
+    }
+    if (curent_id != 0) {
+        return LIST_GRAPH_ERROR;
+    }
+
+    size_t free_cnt = 0;
+    size_t curent_free_id = list->free;
+    size_t next_free_id   = 0;
+    while (curent_free_id != NULL_PTR) {
+        free_cnt++;
+
+        if (curent_free_id >= list->data.size) {
+            return LIST_GRAPH_ERROR;
+        }
+
+        VectorGet(&list->next, curent_free_id, &next_free_id);
+        curent_free_id = next_free_id;
+    }
+    if (list->size + 1 + free_cnt != list->data.size) {
+        return LIST_GRAPH_ERROR;
     }
 
     return list->last_error = LIST_OK;
@@ -159,11 +206,11 @@ void ListGraphDump(List* list) {
         size_t prev = 0;
         VectorGet(&list->prev, elem_i, &prev);
 
-        if (next != NULL_PTR) {
+        if (next != NULL_PTR && next <= list->data.size) {
             fprintf(build_dump_file, "    %lu -> %lu [label = \"next\"];\n", elem_i, next);
         }
 
-        if (prev != NULL_PTR) {
+        if (prev != NULL_PTR && prev <= list->data.size) {
             fprintf(build_dump_file, "    %lu -> %lu [label = \"prev\"];\n", elem_i, prev);
         }
     }
@@ -223,6 +270,8 @@ ListError ListInsert(List* list, size_t id, list_elem_t elem) {
 
     list->free = next_free;
 
+    list->size++;
+
     LIST_CHECK(list);
 
     return list->last_error = LIST_OK;
@@ -266,6 +315,8 @@ ListError ListDelete(List* list, size_t id) {
     }
 
     list->free = id;
+
+    list->size--;
 
     LIST_CHECK(list);
 
