@@ -249,7 +249,7 @@ VectorError VectorFree(Vector* vector) {
     return VECTOR_OK;
 }
 
-VectorError VectorPush(Vector* vector, void* elem) {
+VectorError VectorPush(Vector* vector, const void* elem) {
     VECTOR_CHECK(vector);
 
     if (vector == NULL) {
@@ -316,7 +316,7 @@ VectorError VectorGet(Vector* vector, size_t i, void* dest){
     return vector->last_error_code = VECTOR_OK;
 }
 
-VectorError VectorSet(Vector* vector, size_t i, void* src) {
+VectorError VectorSet(Vector* vector, size_t i, const void* src) {
     assert(src);
 
     VECTOR_CHECK(vector);

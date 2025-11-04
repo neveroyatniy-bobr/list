@@ -56,24 +56,30 @@ ListError ListInit(List* list) {
     }
 
     if (VectorInit(&list->next, 0, sizeof(size_t)) != VECTOR_OK) {
+        VectorFree(&list->data);
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
     
     if (VectorInit(&list->prev, 0, sizeof(size_t)) != VECTOR_OK) {
+        VectorFree(&list->data);
+        VectorFree(&list->next);
         return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
-    if (VectorPush(&list->data, (void*)const_cast<list_elem_t*>(&FECTIVE_ELEM_VALUE)) != VECTOR_OK) {
+    if (VectorPush(&list->data, &FECTIVE_ELEM_VALUE) != VECTOR_OK) {
+        ListDestroy(list);
         return list->last_error = LIST_DATA_VECTOR_ERROR;
     }
 
     size_t fective_id = 0;
 
     if (VectorPush(&list->next, &fective_id) != VECTOR_OK) {
+        ListDestroy(list);
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
     if (VectorPush(&list->prev, &fective_id) != VECTOR_OK) {
+        ListDestroy(list);
         return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
@@ -112,11 +118,11 @@ ListError ListExpand(List* list) {
         return list->last_error = LIST_DATA_VECTOR_ERROR;
     }
 
-    if (VectorPush(&list->next, (void*)const_cast<size_t*>(&NULL_PTR)) != VECTOR_OK) {
+    if (VectorPush(&list->next, &NULL_PTR) != VECTOR_OK) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorPush(&list->prev, (void*)const_cast<size_t*>(&NULL_PTR)) != VECTOR_OK) {
+    if (VectorPush(&list->prev, &NULL_PTR) != VECTOR_OK) {
         return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
@@ -385,7 +391,7 @@ ListError ListDeleteAt(List* list, size_t id) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorSet(&list->prev, id, (void*)const_cast<size_t*>(&NULL_PTR)) != VECTOR_OK) {
+    if (VectorSet(&list->prev, id, &NULL_PTR) != VECTOR_OK) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 

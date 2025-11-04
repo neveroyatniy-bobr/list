@@ -55,13 +55,13 @@ VectorError VectorContraction(Vector* vector);
 
 VectorError VectorFree(Vector* vector);
 
-VectorError VectorPush(Vector* vector, void* elem);
+VectorError VectorPush(Vector* vector, const void* elem);
 
 VectorError VectorPop(Vector* vector, void* poped_elem);
 
 VectorError VectorGet(Vector* vector, size_t i, void* dest);
 
-VectorError VectorSet(Vector* vector, size_t i, void* src);
+VectorError VectorSet(Vector* vector, size_t i, const void* src);
 
 VectorError VectorVerefy(Vector* vector);
 
