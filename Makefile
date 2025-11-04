@@ -28,17 +28,17 @@ RESET = "\e[0m"
 MD = mkdir
 RM = rm
 
-.PHONY : All BuildAndRun Build Run Doxygen CommitWarning CreateBuildDir Clean
+.PHONY : all build_and_run build run doxygen commit_warning create_build_dir clean
 
-All: Build
+all: build
 
-BuildAndRun: Build Run
+build_and_run: build run
 
 ifeq ($(BUILD_TYPE), RELEASE)
-Build: CreateBuildDir $(MY_PROGRAM) CommitWarning
+build: create_build_dir $(MY_PROGRAM) commit_warning
 	@echo "RELEASE_BUILD\n"
 else
-Build: CreateBuildDir $(MY_PROGRAM) CommitWarning
+build: create_build_dir $(MY_PROGRAM) commit_warning
 	@echo "DEBUG_BUILD\n"
 endif
 
@@ -51,18 +51,18 @@ $(OBJ_PREF)main.o: main.cpp
 $(OBJ_PREF)%.o: $(SRC_PREF)%.cpp
 	@$(CXX) -c $< -o $@ $(FLAGS)
 
-Run:
+run:
 	@./$(MY_PROGRAM)
 
-CreateBuildDir:
+create_build_dir:
 	@$(MD) -p $(OBJ_PREF)
 
-Clean:
+clean:
 	@$(RM) -rf $(OBJ_PREF)
 
-Doxygen:
+doxygen:
 	@doxygen docs/Doxyfile 1>/dev/null
 
-CommitWarning:
+commit_warning:
 	@echo $(RED) "\n!!! COMMIT GITHUB !!!\n" $(RESET)
 
