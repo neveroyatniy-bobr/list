@@ -302,8 +302,6 @@ void ListGraphDump(List* list, const char* file, int line) {
     fprintf(dump_file, "<p style=\"font-size: %upx;\">\n    ERROR in %s:%d: %s</p>", DUMP_FONT_SIZE, file, line, ListStrError(list->last_error));
 
     fclose(dump_file);
-
-    system("explorer.exe dump_file.html");
 }
 
 ListError ListInsert(List* list, size_t id, list_elem_t elem) {
