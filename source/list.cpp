@@ -64,17 +64,17 @@ ListError ListInit(List* list) {
     }
 
     if (VectorPush(&list->data, (void*)const_cast<list_elem_t*>(&FECTIVE_ELEM_VALUE)) != VECTOR_OK) {
-        return LIST_DATA_VECTOR_ERROR;
+        return list->last_error = LIST_DATA_VECTOR_ERROR;
     }
 
     size_t fective_id = 0;
 
     if (VectorPush(&list->next, &fective_id) != VECTOR_OK) {
-        return LIST_NEXT_VECTOR_ERROR;
+        return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
     if (VectorPush(&list->prev, &fective_id) != VECTOR_OK) {
-        return LIST_PREV_VECTOR_ERROR;
+        return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
     list->free = NULL_PTR;
