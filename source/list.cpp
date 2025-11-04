@@ -81,7 +81,7 @@ ListError ListInit(List* list) {
         return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
-    list->free = NULL_PTR;
+    list->free = NULL_ID;
 
     list->size = 0;
 
@@ -116,11 +116,11 @@ ListError ListExpand(List* list) {
         return list->last_error = LIST_DATA_VECTOR_ERROR;
     }
 
-    if (VectorPush(&list->next, &NULL_PTR) != VECTOR_OK) {
+    if (VectorPush(&list->next, &NULL_ID) != VECTOR_OK) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorPush(&list->prev, &NULL_PTR) != VECTOR_OK) {
+    if (VectorPush(&list->prev, &NULL_ID) != VECTOR_OK) {
         return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
 
@@ -175,7 +175,7 @@ ListError ListVerefy(List* list) {
     size_t free_cnt = 0;
     size_t curent_free_id = list->free;
     size_t next_free_id   = 0;
-    while (curent_free_id != NULL_PTR) {
+    while (curent_free_id != NULL_ID) {
         free_cnt++;
 
         if (curent_free_id >= list->data.size) {
@@ -226,11 +226,11 @@ void ListGraphDump(List* list, const char* file, int line) {
         size_t prev = 0;
         VectorGet(&list->prev, elem_i, &prev);
 
-        if (next != NULL_PTR && next <= list->data.size) {
+        if (next != NULL_ID && next <= list->data.size) {
             fprintf(build_dump_file, "    %lu -> %lu [label = \"next\"];\n", elem_i, next);
         }
 
-        if (prev != NULL_PTR && prev <= list->data.size) {
+        if (prev != NULL_ID && prev <= list->data.size) {
             fprintf(build_dump_file, "    %lu -> %lu [label = \"prev\"];\n", elem_i, prev);
         }
     }
@@ -282,14 +282,14 @@ void ListGraphDump(List* list, const char* file, int line) {
             fprintf(dump_file, "        <th>%d</th>\n", value);
         }
 
-        if (next == NULL_PTR) {
+        if (next == NULL_ID) {
             fprintf(dump_file, "        <th>null ptr</th>\n");
         }
         else {
             fprintf(dump_file, "        <th>%lu</th>\n", next);
         }
 
-        if (prev == NULL_PTR) {
+        if (prev == NULL_ID) {
             fprintf(dump_file, "        <th>null ptr</th>\n");
         }
         else {
@@ -314,7 +314,7 @@ ListError ListInsertAfter(List* list, size_t id, list_elem_t elem) {
 
     LIST_CHECK(list);
 
-    if (list->free == NULL_PTR) {
+    if (list->free == NULL_ID) {
         ListExpand(list);
     }
 
@@ -389,7 +389,7 @@ ListError ListDeleteAt(List* list, size_t id) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorSet(&list->prev, id, &NULL_PTR) != VECTOR_OK) {
+    if (VectorSet(&list->prev, id, &NULL_ID) != VECTOR_OK) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 

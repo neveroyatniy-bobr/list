@@ -37,7 +37,8 @@ struct List {
 static const list_elem_t FECTIVE_ELEM_VALUE = 1789657045;
 static const size_t FECTIVE_ID = 0;
 
-static const size_t NULL_PTR = 21312326;
+/// @brief ID никакого элемента
+static const size_t NULL_ID = 21312326;
 
 static const unsigned int DUMP_FONT_SIZE = 36;
 
