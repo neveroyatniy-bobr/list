@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "vector.hpp"
 #include "color.hpp"
@@ -237,7 +238,15 @@ void ListGraphDump(List* list, const char* file, int line) {
 
     fclose(build_dump_file);
 
-    system("dot -Tsvg build_dump_file.dot -o dump_file.html");
+
+    char command[sizeof(BUILD_DUMP_FILE_NAME) + sizeof(DUMP_FILE_NAME) + sizeof("dot -Tsvg ") + sizeof(" -o ")];
+
+    strcpy(command, "dot -Tsvg ");
+    strcat(command, BUILD_DUMP_FILE_NAME);
+    strcat(command, " -o ");
+    strcat(command, DUMP_FILE_NAME);
+
+    system(command);
 
     FILE* dump_file = fopen("dump_file.html", "a");
 
@@ -394,4 +403,129 @@ ListError ListDeleteAt(List* list, size_t id) {
     LIST_CHECK(list);
 
     return list->last_error = LIST_OK;
+}
+
+ListError ListGetNext(List* list, size_t i, size_t* next) {
+    assert(list != NULL);
+
+    LIST_CHECK(list);
+
+    if (VectorGet(&list->next, i, next) != VECTOR_OK) {
+        return list->last_error = LIST_NEXT_VECTOR_ERROR;
+    }
+
+    LIST_CHECK(list);
+
+    return list->last_error = LIST_OK;
+}
+
+ListError ListGetPrev(List* list, size_t i, size_t* prev) {
+    assert(list != NULL);
+
+    LIST_CHECK(list);
+
+    if (VectorGet(&list->prev, i, prev) != VECTOR_OK) {
+        return list->last_error = LIST_PREV_VECTOR_ERROR;
+    }
+
+    LIST_CHECK(list);
+
+    return list->last_error = LIST_OK;
+}
+
+ListError ListGetData(List* list, size_t i, list_elem_t* data) {
+    assert(list != NULL);
+
+    LIST_CHECK(list);
+
+    if (VectorGet(&list->data, i, data) != VECTOR_OK) {
+        return list->last_error = LIST_DATA_VECTOR_ERROR;
+    }
+
+    LIST_CHECK(list);
+
+    return list->last_error = LIST_OK;
+}
+
+ListError ListSetData(List* list, size_t i, const list_elem_t* data) {
+    assert(list != NULL);
+
+    LIST_CHECK(list);
+
+    if (VectorSet(&list->data, i, data) != VECTOR_OK) {
+        return list->last_error = LIST_DATA_VECTOR_ERROR;
+    }
+
+    LIST_CHECK(list);
+
+    return list->last_error = LIST_OK;
+}
+
+ListError ListGetFront(List* list, size_t i, size_t* front_id) {
+    assert(list != NULL);
+
+    return ListGetNext(list, i, front_id);
+}
+
+ListError ListGetBack(List* list, size_t i, size_t* back_id) {
+    assert(list != NULL);
+
+    return ListGetPrev(list, i, back_id);
+}
+
+ListError ListInsertFront(List* list, list_elem_t elem) {
+    assert(list != NULL);
+
+    return ListInsertAfter(list, 0, elem);
+}
+
+ListError ListInsertBack(List* list, list_elem_t elem) {
+    assert(list != NULL);
+
+    size_t fective_prev = 0;
+
+    ListError list_error = ListGetPrev(list, 0, &fective_prev);
+    if (list_error != LIST_OK) {
+        return list_error;
+    }
+
+    return ListInsertAfter(list, fective_prev, elem);
+}
+
+ListError ListDeleteFront(List* list) {
+    assert(list != NULL);
+
+    size_t fective_next = 0;
+
+    ListError list_error = ListGetPrev(list, 0, &fective_next);
+    if (list_error != LIST_OK) {
+        return list_error;
+    }
+
+    return ListDeleteAt(list, fective_next);
+}
+
+ListError ListDeleteBsck(List* list) {
+    assert(list != NULL);
+
+    size_t fective_prev = 0;
+
+    ListError list_error = ListGetPrev(list, 0, &fective_prev);
+    if (list_error != LIST_OK) {
+        return list_error;
+    }
+
+    return ListDeleteAt(list, fective_prev);
+}
+
+size_t ListSize(List* list) {
+    assert(list != NULL);
+
+    return list->size;
+}
+
+bool ListIsEmpty(List* list) {
+    assert(list != NULL);
+
+    return list->size == 1;
 }
