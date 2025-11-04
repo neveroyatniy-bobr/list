@@ -15,8 +15,10 @@ enum ListError {
     LIST_NEXT_VECTOR_ERROR =  2,
     LIST_PREV_VECTOR_ERROR =  3,
     DELETE_FECTIVE_ELEM    =  4,
-    BAD_FECTIVE_ELEM       =  5,
-    LIST_GRAPH_ERROR       =  6
+    LIST_BAD_FECTIVE_ELEM  =  5,
+    LIST_GRAPH_ERROR       =  6,
+    LIST_BAD_ID            =  7,
+    LIST_MEMORY_LEAK       =  8
 };
 
 const char* ListStrError(ListError error);

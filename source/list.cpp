@@ -24,11 +24,17 @@ const char* ListStrError(ListError error) {
     case DELETE_FECTIVE_ELEM:
         return "Попытка удалить фективный элемент\n";
         break;
-    case BAD_FECTIVE_ELEM:
+    case LIST_BAD_FECTIVE_ELEM:
         return "Нверный фективный элемент\n";
         break;
     case LIST_GRAPH_ERROR:
         return "Ошибка в связях графа листа\n";
+        break;
+    case LIST_BAD_ID:
+        return "Неправильный id элемента\n";
+        break;
+    case LIST_MEMORY_LEAK:
+        return "Потеря памяти в листе\n";
         break;
     default:
         return "Непредвиденная ошибка\n";
@@ -119,7 +125,6 @@ ListError ListExpansion(List* list) {
     return list->last_error = LIST_OK;
 }
 
-//FIXME Разделить LIST_GRAPH_ERROR на разные ошибки
 ListError ListVerefy(List* list) {
     assert(list != NULL);
 
@@ -144,7 +149,7 @@ ListError ListVerefy(List* list) {
         return list->last_error = LIST_DATA_VECTOR_ERROR;
     }
     if (fective_value != FECTIVE_ELEM_VALUE) {
-        return list->last_error = BAD_FECTIVE_ELEM;
+        return list->last_error = LIST_BAD_FECTIVE_ELEM;
     }
 
     size_t curent_id = 0;
@@ -156,7 +161,7 @@ ListError ListVerefy(List* list) {
         curent_id = next_id;
 
         if (curent_id >= list->data.size) {
-            return list->last_error = LIST_GRAPH_ERROR;
+            return list->last_error = LIST_BAD_ID;
         }
     }
     if (curent_id != 0) {
@@ -170,7 +175,7 @@ ListError ListVerefy(List* list) {
         free_cnt++;
 
         if (curent_free_id >= list->data.size) {
-            return list->last_error = LIST_GRAPH_ERROR;
+            return list->last_error = LIST_BAD_ID;
         }
 
         if (VectorGet(&list->next, curent_free_id, &next_free_id)) {
@@ -179,7 +184,7 @@ ListError ListVerefy(List* list) {
         curent_free_id = next_free_id;
     }
     if (list->size + 1 + free_cnt != list->data.size) {
-        return list->last_error = LIST_GRAPH_ERROR;
+        return list->last_error = LIST_MEMORY_LEAK;
     }
 
     return list->last_error = LIST_OK;
@@ -350,7 +355,6 @@ ListError ListDelete(List* list, size_t id) {
         return list->last_error = DELETE_FECTIVE_ELEM;
     }
 
-    // FIXME function?
     size_t delete_next = 0;
     if (VectorGet(&list->next, id, &delete_next) != VECTOR_OK) {
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
