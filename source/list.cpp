@@ -71,14 +71,12 @@ ListError ListInit(List* list) {
         return list->last_error = LIST_DATA_VECTOR_ERROR;
     }
 
-    size_t fective_id = 0;
-
-    if (VectorPush(&list->next, &fective_id) != VECTOR_OK) {
+    if (VectorPush(&list->next, &FECTIVE_ID) != VECTOR_OK) {
         ListDestroy(list);
         return list->last_error = LIST_NEXT_VECTOR_ERROR;
     }
 
-    if (VectorPush(&list->prev, &fective_id) != VECTOR_OK) {
+    if (VectorPush(&list->prev, &FECTIVE_ID) != VECTOR_OK) {
         ListDestroy(list);
         return list->last_error = LIST_PREV_VECTOR_ERROR;
     }
