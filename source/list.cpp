@@ -304,7 +304,7 @@ void ListGraphDump(List* list, const char* file, int line) {
     fclose(dump_file);
 }
 
-ListError ListInsert(List* list, size_t id, list_elem_t elem) {
+ListError ListInsertAfter(List* list, size_t id, list_elem_t elem) {
     assert(list != NULL);
     assert(id < list->data.size);
 
@@ -353,7 +353,7 @@ ListError ListInsert(List* list, size_t id, list_elem_t elem) {
     return list->last_error = LIST_OK;
 }
 
-ListError ListDelete(List* list, size_t id) {
+ListError ListDeleteAt(List* list, size_t id) {
     assert(list != NULL);
     assert(id < list->data.size);
 

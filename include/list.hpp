@@ -50,9 +50,9 @@ ListError ListVerefy(List* list);
 
 void ListGraphDump(List* list, const char* file, int line);
 
-ListError ListInsert(List* list, size_t id, list_elem_t elem);
+ListError ListInsertAfter(List* list, size_t id, list_elem_t elem);
 
-ListError ListDelete(List* list, size_t id);
+ListError ListDeleteAt(List* list, size_t id);
 
 #define LIST_CHECK(list)                    \
     {                                       \
