@@ -193,6 +193,11 @@ ListError ListVerefy(List* list) {
 void ListGraphDump(List* list, const char* file, int line) {
     FILE* build_dump_file = fopen("build_dump_file.dot", "w");
 
+    if (build_dump_file == NULL) {
+        fprintf(stderr, "Ошибка в создании файла дампа\n");
+        return;
+    }
+
     fprintf(build_dump_file, "digraph G {\n    rankdir=LR;\n    node [shape=record];\n\n");
 
     for (size_t elem_i = 0; elem_i < list->data.size; elem_i++) {
@@ -237,6 +242,11 @@ void ListGraphDump(List* list, const char* file, int line) {
     system("dot -Tsvg build_dump_file.dot -o dump_file.html");
 
     FILE* dump_file = fopen("dump_file.html", "a");
+
+    if (dump_file == NULL) {
+        fprintf(stderr, "Ошибка в создании файла дампа\n");
+        return;
+    }
 
     fprintf(dump_file, "<table border=\"1\" style=\"font-size: %u; width: 50%%;\">\n", DUMP_FONT_SIZE);
 
