@@ -106,7 +106,7 @@ ListError ListDestroy(List* list) {
     return list->last_error = LIST_OK;
 }
 
-ListError ListExpansion(List* list) {
+ListError ListExpand(List* list) {
     int pushed_elem = 0;
     if (VectorPush(&list->data, &pushed_elem) != VECTOR_OK) {
         return list->last_error = LIST_DATA_VECTOR_ERROR;
@@ -303,7 +303,7 @@ ListError ListInsert(List* list, size_t id, list_elem_t elem) {
     LIST_CHECK(list);
 
     if (list->free == NULL_PTR) {
-        ListExpansion(list);
+        ListExpand(list);
     }
 
     size_t next_free = 0;

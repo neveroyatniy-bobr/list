@@ -44,7 +44,7 @@ ListError ListInit(List* list);
 
 ListError ListDestroy(List* list);
 
-ListError ListExpansion(List* list);
+ListError ListExpand(List* list);
 
 ListError ListVerefy(List* list);
 
