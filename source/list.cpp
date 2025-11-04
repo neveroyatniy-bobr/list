@@ -95,17 +95,11 @@ ListError ListDestroy(List* list) {
 
     LIST_CHECK(list);
 
-    if (VectorFree(&list->data) != VECTOR_OK) {
-        return list->last_error = LIST_DATA_VECTOR_ERROR;
-    }
+    VectorFree(&list->data);
 
-    if (VectorFree(&list->next) != VECTOR_OK) {
-        return list->last_error = LIST_NEXT_VECTOR_ERROR;
-    }
+    VectorFree(&list->next);
 
-    if (VectorFree(&list->prev) != VECTOR_OK) {
-        return list->last_error = LIST_PREV_VECTOR_ERROR;
-    }
+    VectorFree(&list->prev);
 
     return list->last_error = LIST_OK;
 }
