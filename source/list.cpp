@@ -239,16 +239,13 @@ void ListGraphDump(List* list, const char* file, int line) {
     fclose(build_dump_file);
 
 
-    char command[sizeof(BUILD_DUMP_FILE_NAME) + sizeof(DUMP_FILE_NAME) + sizeof("dot -Tsvg ") + sizeof(" -o ")];
+    char command[BUILD_DUMP_COMMAND_SIZE];
 
-    strcpy(command, "dot -Tsvg ");
-    strcat(command, BUILD_DUMP_FILE_NAME);
-    strcat(command, " -o ");
-    strcat(command, DUMP_FILE_NAME);
+    sprintf(command, "dot -Tsvg %s -o %s", BUILD_DUMP_FILE_NAME, DUMP_FILE_NAME);
 
     system(command);
 
-    FILE* dump_file = fopen("dump_file.html", "a");
+    FILE* dump_file = fopen(DUMP_FILE_NAME, "a");
 
     if (dump_file == NULL) {
         fprintf(stderr, "Ошибка в создании файла дампа\n");
@@ -461,35 +458,35 @@ ListError ListSetData(List* list, size_t i, const list_elem_t* data) {
     return list->last_error = LIST_OK;
 }
 
-ListError ListGetFront(List* list, size_t i, size_t* front_id) {
+ListError ListGetFront(List* list, size_t* front_id) {
     assert(list != NULL);
 
-    return ListGetNext(list, i, front_id);
+    return ListGetNext(list, FECTIVE_ID, front_id);
 }
 
-ListError ListGetBack(List* list, size_t i, size_t* back_id) {
+ListError ListGetBack(List* list, size_t* back_id) {
     assert(list != NULL);
 
-    return ListGetPrev(list, i, back_id);
+    return ListGetPrev(list, FECTIVE_ID, back_id);
 }
 
 ListError ListInsertFront(List* list, list_elem_t elem) {
     assert(list != NULL);
-
-    return ListInsertAfter(list, 0, elem);
+    
+    return ListInsertAfter(list, FECTIVE_ID, elem);
 }
 
 ListError ListInsertBack(List* list, list_elem_t elem) {
     assert(list != NULL);
 
-    size_t fective_prev = 0;
+    size_t back = 0;
 
-    ListError list_error = ListGetPrev(list, 0, &fective_prev);
+    ListError list_error = ListGetBack(list, &back);
     if (list_error != LIST_OK) {
         return list_error;
     }
 
-    return ListInsertAfter(list, fective_prev, elem);
+    return ListInsertAfter(list, back, elem);
 }
 
 ListError ListDeleteFront(List* list) {
@@ -528,4 +525,10 @@ bool ListIsEmpty(List* list) {
     assert(list != NULL);
 
     return list->size == 1;
+}
+
+size_t ListCapacity(List* list) {
+    assert(list != NULL);
+
+    return list->data.capacity - VECTOR_BIRD_SIZE * 2;
 }

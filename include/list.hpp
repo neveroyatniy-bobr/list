@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#include <stdint.h>
+
 #include "vector.hpp"
 
 struct List;
@@ -25,6 +27,8 @@ const char* ListStrError(ListError error);
 
 void ListPrintError(List* list, const char* file, int line);
 
+#define LIST_PRINT_ERROR(list)  ListPrintError(list, __FILE__, __LINE__)
+
 struct List {
     Vector data; // <int>
     Vector next; // <size_t>
@@ -38,12 +42,13 @@ static const list_elem_t FECTIVE_ELEM_VALUE = 1789657045;
 static const size_t FECTIVE_ID = 0;
 
 /// @brief ID никакого элемента
-static const size_t NULL_ID = 21312326;
+static const size_t NULL_ID = SIZE_MAX;
 
 static const unsigned int DUMP_FONT_SIZE = 36;
 
-static const char DUMP_FILE_NAME[] = "dump_file.html";
-static const char BUILD_DUMP_FILE_NAME[] = "build_dump_file.dot";
+static const char* DUMP_FILE_NAME = "dump_file.html";
+static const char* BUILD_DUMP_FILE_NAME = "build_dump_file.dot";
+static const size_t BUILD_DUMP_COMMAND_SIZE = 128;
 
 ListError ListInit(List* list);
 
@@ -54,6 +59,8 @@ ListError ListExpand(List* list);
 ListError ListVerefy(List* list);
 
 void ListGraphDump(List* list, const char* file, int line);
+
+#define LIST_GRAPH_DUMP(list) ListGraphDump(list, __FILE__, __LINE__)
 
 ListError ListInsertAfter(List* list, size_t id, list_elem_t elem);
 
@@ -67,9 +74,9 @@ ListError ListGetData(List* list, size_t i, list_elem_t* data);
 
 ListError ListSetData(List* list, size_t i, const list_elem_t* data);
 
-ListError ListGetFront(List* list, size_t i, size_t* front_id);
+ListError ListGetFront(List* list, size_t* front_id);
 
-ListError ListGetBack(List* list, size_t i, size_t* back_id);
+ListError ListGetBack(List* list, size_t* back_id);
 
 ListError ListInsertFront(List* list, list_elem_t elem);
 

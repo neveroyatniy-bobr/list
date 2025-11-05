@@ -6,13 +6,13 @@ int main() {
     List list;
     
     if (ListInit(&list) != LIST_OK) {
-        ListPrintError(&list, __FILE__, __LINE__);
+        LIST_PRINT_ERROR(&list);
         return 1;
     }
 
     for (int i = 0; i < 11; i++) {
         if (ListInsertAfter(&list, 0, i) != LIST_OK) {
-            ListPrintError(&list, __FILE__, __LINE__);
+            LIST_PRINT_ERROR(&list);
             return 1;
         }
     }
@@ -21,8 +21,7 @@ int main() {
     VectorGet(&list.next, 5, &fective_next);
     for (size_t i = 0; i < 3; i++) {
        if (ListDeleteAt(&list, fective_next) != LIST_OK) {
-            ListPrintError(&list, __FILE__, __LINE__);
-            VectorDump(&list.prev, __FILE__, __LINE__);
+            LIST_PRINT_ERROR(&list);
             return 1;
         }
         VectorGet(&list.next, 5, &fective_next);
@@ -30,17 +29,17 @@ int main() {
 
     for (int i = 0; i < 5; i++) {
         if (ListInsertAfter(&list, 0, i) != LIST_OK) {
-            ListPrintError(&list, __FILE__, __LINE__);
+            LIST_PRINT_ERROR(&list);
             return 1;
         }
     }
 
-    ListGraphDump(&list, __FILE__, __LINE__);
+    LIST_GRAPH_DUMP(&list);
 
     system("explorer.exe dump_file.html");
 
     if (ListDestroy(&list) != LIST_OK) {
-        ListPrintError(&list, __FILE__, __LINE__);
+        LIST_PRINT_ERROR(&list);
         return 1;
     }
 
