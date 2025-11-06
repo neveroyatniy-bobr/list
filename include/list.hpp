@@ -84,7 +84,7 @@ ListError ListInsertBack(List* list, list_elem_t elem);
 
 ListError ListDeleteFront(List* list);
 
-ListError ListDeleteBsck(List* list);
+ListError ListDeleteBack(List* list);
 
 size_t ListSize(List* list);
 

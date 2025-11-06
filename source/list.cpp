@@ -502,7 +502,7 @@ ListError ListDeleteFront(List* list) {
     return ListDeleteAt(list, fective_next);
 }
 
-ListError ListDeleteBsck(List* list) {
+ListError ListDeleteBack(List* list) {
     assert(list != NULL);
 
     size_t fective_prev = 0;
